@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from dotenv import load_dotenv
+from waitress import serve
+from datetime import datetime
 import os
 
 # Load environment variables
@@ -14,6 +16,11 @@ app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-here')
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+# Context processor for templates
+@app.context_processor
+def inject_now():
+    return {'now': datetime.utcnow()}
 
 # Simple User class for authentication
 class User(UserMixin):
@@ -54,4 +61,5 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    print('Starting server on http://127.0.0.1:5000')
+    serve(app, host='127.0.0.1', port=5000) 
